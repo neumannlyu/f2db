@@ -1,0 +1,23 @@
+{
+    "host": "172.16.5.114",
+    "user": "ly",
+    "password": "123456",
+    "dbname": "lydb",
+    "tables": [
+        {
+            "name": "file_suffix_table",
+            "file": "fst.csv",
+            "create": "CREATE TABLE file_suffix_table(id SERIAL PRIMARY KEY NOT NULL, suffix_name TEXT NOT NULL, importance INT NOT NULL, description TEXT);"
+        },
+        {
+            "name": "kernel_vulnerability_table",
+            "file": "kvt.csv",
+            "create": "CREATE TABLE kernel_vulnerability_table(id SERIAL PRIMARY KEY NOT NULL, vul_id TEXT NOT NULL, affected_kernel_ver TEXT NOT NULL, vul_type TEXT, vul_description TEXT, severity INT, fix_suggestion TEXT);"
+        },
+        {
+            "name": "known_file_table",
+            "file": "kft.csv",
+            "create": "CREATE TABLE known_file_table(id SERIAL PRIMARY KEY NOT NULL,file_name TEXT NOT NULL,idx INT NOT NULL, category INT,importance INT NOT NULL, count INT,md5 TEXT,description TEXT);"
+        }
+    ]
+}

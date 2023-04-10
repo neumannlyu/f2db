@@ -1,0 +1,6 @@
+漏洞编号,受影响内核版本,漏洞类型,漏洞描述,危害程度,修复建议
+CVE-2023-28866,"[0.0.0,6.2.8]",越界访问,在 6.2.8 之前的 Linux 内核中，net/bluetooth/hci_sync.c 允许越界访问,6,升级内核版本
+CVE-2023-28772,"[0.0.0,5.13.3)",缓冲区溢出,在 5.13.3 之前的 Linux 内核中lib/seq_buf.c 存在缓冲区溢出。,8,升级内核版本
+CVE-2023-28466,"[0.0.0,6.2.9]",条件竞争,直到 6.2.6 的 Linux 内核中的 net/tls/tls_main.c 存在条件竞争，最终会导致UAF或空指针解引用,7,升级内核版本
+CVE-2023-26607,6.0.8,越界访问,在Linux kernel 6.0.8中，fs/ntfs/attrib.c中的ntfs_attr_find存在越界读取。,7,升级内核版本
+CVE-2023-26606,6.0.8,use-after-free ,在Linux内核6.0.8中，fs/ntfs3/bitmap.c中的ntfs_trim_fs中有use-after-free。,8,升级内核版本
