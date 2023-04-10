@@ -31,3 +31,11 @@ f2db <-h -u -p -d> [-f|-t|-c|-i|-a]
         [user] 远程数据库连接的用户名
 ```
 
+
+
+构建：
+
+```
+go build main.go -o f2db
+```
+
