@@ -17,7 +17,12 @@
         {
             "name": "known_file_table",
             "file": "kft.csv",
-            "create": "CREATE TABLE known_file_table(id SERIAL PRIMARY KEY NOT NULL,file_name TEXT NOT NULL,idx INT NOT NULL, category INT,importance INT NOT NULL, count INT,md5 TEXT,description TEXT);"
+            "create": "CREATE TABLE known_file_table(id SERIAL PRIMARY KEY NOT NULL,file_name TEXT NOT NULL,idx INT NOT NULL, type INT,score INT NOT NULL, count INT,md5 TEXT,description TEXT);"
+        },
+        {
+            "name": "binary_file_table",
+            "file": "bft.csv",
+            "create": "CREATE TABLE binary_file_table(id SERIAL PRIMARY KEY NOT NULL,file_name TEXT NOT NULL,version_key TEXT NOT NULL);"
         }
     ]
 }

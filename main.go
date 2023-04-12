@@ -60,15 +60,12 @@ func _init() bool {
     pa := flag.Bool("a", false, "[append] 在表后进行追加。") //_is_table_append
     flag.Usage = func() {
         fmt.Fprintf(os.Stderr, "Usage of params:\n")
-        fmt.Fprintf(os.Stderr, "    f2db <-h -u -p -d> [-f|-t|-c|-i|-a]\n\n")
+        fmt.Fprintf(os.Stderr, "    f2db [-f|-t|-c|-i|-a]\n\n")
         fmt.Fprintf(os.Stderr, "    Usage:\n")
         fmt.Fprintf(os.Stderr, "      [1]从文件中导入,追加到数据库中 f2db -t example_table -f example.csv -a\n")
         fmt.Fprintf(os.Stderr, "      [2]从文件中导入,并且清除原有数据 f2db -t example_table -f example.csv -c\n")
         fmt.Fprintf(os.Stderr, "      [3]用文件中数据初始化数据库 f2db -i\n")
-        fmt.Fprintf(os.Stderr, "         按照文件与表对应规则进行数据填充(或者json文件中修改)：\n")
-        fmt.Fprintf(os.Stderr, "         kft.csv <> known_file_table\n")
-        fmt.Fprintf(os.Stderr, "         fst.csv <> file_suffix_table\n")
-        fmt.Fprintf(os.Stderr, "         kvt.csv <> kernel_vulnerablity_table\n")
+        fmt.Fprintf(os.Stderr, "         按照Json文件中对应规则进行数据填充\n")
         flag.PrintDefaults()
     }
     flag.Parse()

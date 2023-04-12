@@ -84,10 +84,7 @@ func ImportFromCVS(db *sql.DB, table_name, file_path string) (count int) {
 func getInsertExp(db *sql.DB, table_name string) string {
     colsname := []string{}
     colstype := []string{}
-
-    fmt.Println("SELECT column_name, data_type FROM information_schema.columns WHERE table_name ='" + table_name + "';")
     rows, err := db.Query("SELECT column_name, data_type FROM information_schema.columns WHERE table_name ='" + table_name + "';")
-    fmt.Printf("rows: %v\n", rows)
     if err != nil {
         panic(err)
     }
@@ -100,11 +97,12 @@ func getInsertExp(db *sql.DB, table_name string) string {
         if err != nil {
             panic(err)
         }
-        fmt.Println(columnName, dataType)
-        // 一般情况下，如果首个为id的话，默认为自动递增的编号，在添加数据时忽略，有数据库自行添加
+
+        //* 一般情况下，如果首个为id的话，默认为自动递增的编号，在添加数据时忽略，有数据库自行添加
         if columnName == "id" {
             continue
         }
+
         colsname = append(colsname, columnName)
         colstype = append(colstype, dataType)
     }
