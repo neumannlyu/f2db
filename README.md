@@ -4,7 +4,7 @@
 ## Build
 
 ```
-go build main.go 
+go build
 ```
 
 ## Usage
@@ -26,7 +26,6 @@ Usage of params:
   -i    [init] 初始化数据库。
   -t string
         [table] 远程数据库表名
-```
 
 
 
