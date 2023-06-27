@@ -1,0 +1,29 @@
+{
+    "platform": "postgresql",
+    "host": "127.0.0.1",
+    "user": "ly",
+    "password": "123456",
+    "dbname": "lydb",
+    "tables": [
+        {
+            "name": "table",
+            "file": "table.csv",
+            "create": "CREATE TABLE table ();"
+        },
+        {
+            "name": "table",
+            "file": "table.csv",
+            "create": "CREATE TABLE table ();"
+        },
+        {
+            "name": "table",
+            "file": "table.csv",
+            "create": "CREATE TABLE table ();"
+        },
+        {
+            "name": "table",
+            "file": "table.csv",
+            "create": "CREATE TABLE table ();"
+        }
+    ]
+}

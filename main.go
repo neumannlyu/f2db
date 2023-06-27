@@ -1,57 +1,105 @@
 package main
 
 import (
-    "database/sql"
-    "encoding/json"
-    "f2db/pkg/psql"
+    ms "f2db/pkg/sql"
     "flag"
     "fmt"
-    "io/ioutil"
     "os"
 )
 
 var (
     _file_name       string
     _table_name      string
-    _is_drop         bool
+    _is_clean        bool
     _is_init_db      bool
     _is_table_append bool
 )
 
 func main() {
     // 初始化检查
-    if !_init() {
+    if !parseCommandLineArguments() {
         return
     }
 
-    var dbstruct psql.StDBJson
-    fileBytes, err := ioutil.ReadFile("db.json")
-    if err != nil {
-        fmt.Printf("err.Error(): %v\n", err.Error())
+    // 加载配置
+    sqlcfg := ms.LoadConfigJsonFile("db.json")
+    // check
+    if len(sqlcfg.Platform) == 0 {
+        fmt.Println("load db.json error.")
+        return
     }
 
-    // 将JSON内容解析为结构体
-    err = json.Unmarshal(fileBytes, &dbstruct)
-    if err != nil {
-        fmt.Printf("err.Error(): %v\n", err.Error())
+    var isql ms.ISQL
+    switch sqlcfg.Platform {
+    case "postgresql":
+        isql = &ms.PostgresSQL{
+            DBPtr: nil,
+        }
+        // 打开数据库
+        if !isql.Open(sqlcfg.Host, sqlcfg.User, sqlcfg.Password, sqlcfg.DBName) {
+            return
+        }
+    case "mysql":
+        isql = &ms.MySQL{
+            DBPtr: nil,
+        }
+        // 打开数据库
+        if !isql.Open(sqlcfg.Host, sqlcfg.User, sqlcfg.Password, sqlcfg.DBName) {
+            return
+        }
+    default:
+        fmt.Println("No Suppoted Platform!!!")
+        return
     }
 
-    // 打开数据库连接
-    db, err := psql.OpenPostgresDB(dbstruct.Host, dbstruct.User, dbstruct.Password, dbstruct.DBName)
-    if err != nil {
-        fmt.Printf("OpenPostgresDB err.Error(): %v\n", err.Error())
+    // 清除数据表中所有的数据
+    if _is_clean {
+        for _, table := range sqlcfg.Tables {
+            if isql.Execute(fmt.Sprintf("DELETE FROM %s;", table.TableName)) {
+                fmt.Println("清空 " + _table_name + " 成功。")
+            } else {
+                fmt.Println("清空 " + _table_name + " 失败。")
+            }
+        }
     }
-    defer psql.ClosePostgresDB(db)
 
-    _init_db(db, dbstruct.Tables)
+    // 初始化表。如果执行初始化，会先移除所有的表，然后根据表达式创建新的表格
+    if _is_init_db {
+        for _, table := range sqlcfg.Tables {
+            // 移除表
+            if isql.Execute(fmt.Sprintf("DROP TABLE IF EXISTS %s;", table.TableName)) {
+                fmt.Println("移除 " + table.TableName + " 成功。")
+            } else {
+                fmt.Println("移除 " + table.TableName + " 失败。")
+            }
+            // 创建表
+            if isql.Execute(table.CreateExp) {
+                fmt.Println("创建 " + table.TableName + " 成功。")
+            } else {
+                fmt.Println("创建 " + table.TableName + " 失败。")
+            }
 
-    // 插入数据
-    insertData(db, dbstruct.Tables)
+            // 插入数据
+            count := isql.ImportFromCVS(table.TableName, table.TableFile)
+            fmt.Printf(" %s >> %s table successfully. Total %d records。\n", table.TableFile, table.TableName, count)
+        }
+    }
+
+    if _is_table_append {
+        for _, table := range sqlcfg.Tables {
+            // 插入数据
+            count := isql.ImportFromCVS(table.TableName, table.TableFile)
+            fmt.Printf(" %s >> %s table successfully. Total %d records。\n", table.TableFile, table.TableName, count)
+        }
+    }
+
+    // 清理资源
+    isql.Close()
 }
 
-// _init 初始化。分析参数
+// parseCommandLineArguments 初始化。分析参数
 //  @return bool 是否正常初始化，检查参数是否通过。
-func _init() bool {
+func parseCommandLineArguments() bool {
     // 1. 解析参数
     pf := flag.String("f", "", "[file] 导入的文件。支持cvs")
     pt := flag.String("t", "", "[table] 远程数据库表名")
@@ -75,7 +123,7 @@ func _init() bool {
     }
     _file_name = *pf
     _table_name = *pt
-    _is_drop = *pc
+    _is_clean = *pc
     _is_init_db = *pi
     _is_table_append = *pa
     if !_is_init_db && _file_name == "" {
@@ -84,56 +132,4 @@ func _init() bool {
         return false
     }
     return true
-}
-
-// _init_db 初始化数据库
-//  @param db
-func _init_db(db *sql.DB, tables []psql.StTable) {
-    // 判断是否需要初始化数据库
-    if _is_init_db {
-        for _, table := range tables {
-            // 移除表
-            _, err := db.Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s;", table.TableName))
-            if err != nil {
-                fmt.Println("移除 " + table.TableName + " 失败。" + err.Error())
-            } else {
-                fmt.Println("移除 " + table.TableName + " 成功")
-            }
-
-            // 创建表
-            _, err = db.Exec(table.CreateExp)
-            if err != nil {
-                fmt.Println("创建 " + table.TableName + " 失败。" + err.Error())
-            } else {
-                fmt.Println("创建 " + table.TableName + " 成功")
-            }
-        }
-    }
-
-    if _is_drop {
-        _, err := db.Exec(fmt.Sprintf("DELETE FROM %s;", _table_name))
-        if err != nil {
-            fmt.Println("清空 " + _table_name + " 成功。")
-        } else {
-            fmt.Println("清空 " + _table_name + " 失败。")
-        }
-    }
-}
-
-// insertData 从csv文件中导入数据
-//  @param db
-func insertData(db *sql.DB, tables []psql.StTable) {
-    if _is_init_db {
-        for _, table := range tables {
-            fmt.Printf("导入%s文件成功。%s表中现在记录数为 %d。\n", table.TableFile, table.TableName, psql.ImportFromCVS(db, table.TableName, table.TableFile))
-        }
-    }
-
-    if _is_drop {
-        fmt.Printf("导入%s文件成功。%s表中现在记录数为 %d。\n", _file_name, _table_name, psql.ImportFromCVS(db, _table_name, _file_name))
-    }
-
-    if _is_table_append {
-        fmt.Printf("导入%s文件成功。%s表中现在记录数为 %d。\n", _file_name, _table_name, psql.ImportFromCVS(db, _table_name, _file_name))
-    }
 }
