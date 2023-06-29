@@ -86,7 +86,8 @@ func (m MySQL) ImportFromCVS(tableName, cvsFile string) int {
         tmpInsertExp := exp
         for col := 0; col < len(rows[row]); col++ {
             search := fmt.Sprintf(`##{%d}##`, col)
-            tmpInsertExp = strings.ReplaceAll(tmpInsertExp, search, rows[row][col])
+            tmpInsertExp =
+                strings.ReplaceAll(tmpInsertExp, search, rows[row][col])
         }
         // fmt.Println(tmpInsertExp)
         _, err := m.DBPtr.Exec(tmpInsertExp)
@@ -114,7 +115,9 @@ func (m MySQL) ImportFromCVS(tableName, cvsFile string) int {
 //  @param table_name 要插入表名
 //  @return string 插入语句
 func (m MySQL) genInsertExpModel(table_name string) string {
-    query := fmt.Sprintf("SELECT COLUMN_NAME,DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = '%s'", table_name)
+    query := fmt.Sprintf(
+        "SELECT COLUMN_NAME,DATA_TYPE FROM information_schema.COLUMNS"+
+            " WHERE TABLE_NAME = '%s'", table_name)
     rows, err := m.DBPtr.Query(query)
     if err != nil {
         return err.Error()
@@ -129,7 +132,8 @@ func (m MySQL) genInsertExpModel(table_name string) string {
         if err := rows.Scan(&columnName, &columnType); err != nil {
             return err.Error()
         }
-        //* 一般情况下，如果首个为id的话，默认为自动递增的编号，在添加数据时忽略，有数据库自行添加
+        //* 一般情况下，如果首个为id的话，默认为自动递增的编号，
+        // 在添加数据时忽略，有数据库自行添加
         if columnName == "id" {
             continue
         }

@@ -24,7 +24,9 @@ type PostgresSQL struct {
 //  @return *sql.DB db指针
 //  @return error 错误
 func (pg *PostgresSQL) Open(h, u, p, d string) bool {
-    db, err := sql.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", h, u, p, d))
+    db, err := sql.Open("postgres",
+        fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+            h, u, p, d))
     if err != nil {
         fmt.Printf("open PostgresSQL failed err.Error(): %v\n", err.Error())
         return false
@@ -88,7 +90,8 @@ func (pg PostgresSQL) ImportFromCVS(tableName, cvsFile string) int {
             // ! 将所有的\\替换为\
             rows[row][col] = strings.ReplaceAll(rows[row][col], "\\\\", "\\")
             search := fmt.Sprintf(`##{%d}##`, col)
-            tmpInsertExp = strings.ReplaceAll(tmpInsertExp, search, rows[row][col])
+            tmpInsertExp = strings.ReplaceAll(
+                tmpInsertExp, search, rows[row][col])
         }
         // fmt.Println(tmpInsertExp)
         _, err := pg.DBPtr.Exec(tmpInsertExp)
@@ -118,7 +121,9 @@ func (pg PostgresSQL) ImportFromCVS(tableName, cvsFile string) int {
 func (pg PostgresSQL) genInsertExpModel(table_name string) string {
     colsname := []string{}
     colstype := []string{}
-    rows, err := pg.DBPtr.Query("SELECT column_name, data_type FROM information_schema.columns WHERE table_name ='" + table_name + "';")
+    rows, err := pg.DBPtr.Query(
+        "SELECT column_name, data_type FROM information_schema.columns" +
+            " WHERE table_name ='" + table_name + "';")
     if err != nil {
         panic(err)
     }
@@ -132,7 +137,8 @@ func (pg PostgresSQL) genInsertExpModel(table_name string) string {
             panic(err)
         }
 
-        //* 一般情况下，如果首个为id的话，默认为自动递增的编号，在添加数据时忽略，有数据库自行添加
+        //* 一般情况下，如果首个为id的话，默认为自动递增的编号，
+        // 在添加数据时忽略，有数据库自行添加
         if columnName == "id" {
             continue
         }
@@ -140,9 +146,6 @@ func (pg PostgresSQL) genInsertExpModel(table_name string) string {
         colsname = append(colsname, columnName)
         colstype = append(colstype, dataType)
     }
-
-    // fmt.Sprintf("INSERT INTO known_file_table(file_name, idx, category, importance,count,md5,description) VALUES ( '%s', %s,%s,%s,%s,'%s','%s');",
-    //     rows[i][0], rows[i][1], rows[i][2], rows[i][3], rows[i][4], rows[i][5], rows[i][6])
     exp := "INSERT INTO " + table_name + "("
     for i := 0; i < len(colsname); i++ {
         exp += colsname[i]

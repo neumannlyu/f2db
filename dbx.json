@@ -1,0 +1,34 @@
+{
+    "platform": "postgresql",
+    "host": "172.16.5.114",
+    "user": "ly",
+    "password": "123456",
+    "dbname": "lydb",
+    "tables": [
+        {
+            "name": "known_file_table",
+            "file": "/Users/neumann/MyBak/Cimer/2023/电力物联网平台/代码/sndb/known_file_table.csv",
+            "create": "CREATE TABLE known_file_table (id SERIAL PRIMARY KEY,file_name TEXT NOT NULL,flag INTEGER NOT NULL,rating INTEGER NOT NULL,count INTEGER NOT NULL,description TEXT);"
+        },
+        {
+            "name": "file_type_table",
+            "file": "/Users/neumann/MyBak/Cimer/2023/电力物联网平台/代码/sndb/file_type_table.csv",
+            "create": "CREATE TABLE file_type_table (id SERIAL PRIMARY KEY,suffix_name TEXT, flag INT4 NOT NULL,type_string TEXT NOT NULL,rating INT4 NOT NULL,description TEXT);"
+        },
+        {
+            "name": "kernel_vulnerability_table",
+            "file": "/Users/neumann/MyBak/Cimer/2023/电力物联网平台/代码/sndb/kernel_vulnerability_table.csv",
+            "create": "CREATE TABLE kernel_vulnerability_table (id SERIAL PRIMARY KEY,vul_id TEXT NOT NULL,affected_kernel_ver TEXT NOT NULL,vul_type TEXT,vul_description TEXT,severity INT4,fix_suggestion TEXT);"
+        },
+        {
+            "name": "program_table",
+            "file": "/Users/neumann/MyBak/Cimer/2023/电力物联网平台/代码/sndb/program_table.csv",
+            "create": "CREATE TABLE program_table (id SERIAL PRIMARY KEY,file_name TEXT NOT NULL,ver_search_key TEXT NOT NULL,regular TEXT,version TEXT,md5 TEXT);"
+        },
+        {
+            "name": "program_vulnerability_table",
+            "file": "/Users/neumann/MyBak/Cimer/2023/电力物联网平台/代码/sndb/program_vulnerability_table.csv",
+            "create": "CREATE TABLE program_vulnerability_table (id SERIAL PRIMARY KEY,vid TEXT NOT NULL,file_name TEXT NOT NULL,affected_ver TEXT NOT NULL,vtype TEXT,vdescription TEXT,severity INT4,fix_suggestion TEXT);"
+        }
+    ]
+}
